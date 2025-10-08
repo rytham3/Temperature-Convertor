@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Temperature Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #34495e, #2c3e50);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Weather Effects */
+        .weather-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .rain {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(transparent, #87CEEB);
+            animation: rain-fall linear infinite;
+        }
+
+        .eagle {
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 50px 0 0 50px;
+            animation: eagle-fly 12s linear infinite;
+            opacity: 0.4;
+        }
+
+        .eagle:before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: -5px;
+            width: 25px;
+            height: 12px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 50px 0 0 50px;
+            transform: rotate(-30deg);
+        }
+
+        .eagle:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: -5px;
+            width: 25px;
+            height: 12px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 0 0 50px 50px;
+            transform: rotate(30deg);
+        }
+
+
+
+        /* Rain Animation */
+        @keyframes rain-fall {
+            0% {
+                transform: translateY(-100vh);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        /* Eagle Fly Animation */
+        @keyframes eagle-fly {
+            0% {
+                transform: translateX(-100px) translateY(20vh) rotate(0deg);
+            }
+            25% {
+                transform: translateX(25vw) translateY(15vh) rotate(5deg);
+            }
+            50% {
+                transform: translateX(50vw) translateY(25vh) rotate(0deg);
+            }
+            75% {
+                transform: translateX(75vw) translateY(10vh) rotate(-5deg);
+            }
+            100% {
+                transform: translateX(100vw) translateY(20vh) rotate(0deg);
+            }
+        }
+
+
+
+
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .converter-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            animation: card-float 6s ease-in-out infinite;
+        }
+
+        @keyframes card-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .title {
+            color: #ecf0f1;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: 300;
+        }
+
+        .subtitle {
+            color: #bdc3c7;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            color: #ecf0f1;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .temperature-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ecf0f1;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .temperature-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .temperature-input::placeholder {
+            color: #bdc3c7;
+        }
+
+        .unit-selection {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #3498db;
+        }
+
+        .radio-group label {
+            color: #ecf0f1;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            margin-bottom: 25px;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+
+        .convert-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            background: rgba(46, 204, 113, 0.2);
+            border: 2px solid rgba(46, 204, 113, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            color: #2ecc71;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .converter-card {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .unit-selection {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Weather Effects Container -->
+    <div class="weather-container" id="weatherContainer"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="converter-card">
+            <h1 class="title">🌧️ Temperature Converter</h1>
+            <p class="subtitle">Convert between Celsius and Fahrenheit</p>
+            
+            <div class="input-group">
+                <label for="temperature">Temperature Value:</label>
+                <input 
+                    type="text" 
+                    id="temperature" 
+                    class="temperature-input" 
+                    placeholder="Enter temperature..."
+                    autocomplete="off"
+                >
+            </div>
+            
+            <div class="unit-selection">
+                <div class="radio-group">
+                    <input type="radio" id="celsius" name="unit" value="celsius" checked>
+                    <label for="celsius">Celsius</label>
+                </div>
+                <div class="radio-group">
+                    <input type="radio" id="fahrenheit" name="unit" value="fahrenheit">
+                    <label for="fahrenheit">Fahrenheit</label>
+                </div>
+            </div>
+            
+            <button class="convert-btn" onclick="convertTemperature()">Convert Temperature</button>
+            
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Weather Effects
+        function createWeatherEffects() {
+            const container = document.getElementById('weatherContainer');
+            
+            // Create rain drops
+            for (let i = 0; i < 100; i++) {
+                const rain = document.createElement('div');
+                rain.className = 'rain';
+                rain.style.left = Math.random() * 100 + '%';
+                rain.style.animationDuration = (Math.random() * 1 + 0.5) + 's';
+                rain.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(rain);
+            }
+
+            // Create eagles
+            for (let i = 0; i < 3; i++) {
+                const eagle = document.createElement('div');
+                eagle.className = 'eagle';
+                eagle.style.animationDelay = (i * 4) + 's';
+                eagle.style.animationDuration = (Math.random() * 3 + 12) + 's';
+                container.appendChild(eagle);
+            }
+            
+
+        }
+
+        // Temperature Conversion
+        function convertTemperature() {
+            const input = document.getElementById('temperature').value.trim();
+            const unit = document.querySelector('input[name="unit"]:checked').value;
+            const resultDiv = document.getElementById('result');
+            
+            // Validate input
+            if (!input || isNaN(input)) {
+                showResult('Please enter a valid number!', true);
+                return;
+            }
+            
+            const temperature = parseFloat(input);
+            let convertedTemp, resultUnit, resultText;
+            
+            if (unit === 'celsius') {
+                // Convert Celsius to Fahrenheit
+                convertedTemp = (temperature * 9/5) + 32;
+                resultUnit = '°F';
+                resultText = `${temperature}°C = ${convertedTemp.toFixed(1)}°F`;
+            } else {
+                // Convert Fahrenheit to Celsius
+                convertedTemp = (temperature - 32) * 5/9;
+                resultUnit = '°C';
+                resultText = `${temperature}°F = ${convertedTemp.toFixed(1)}°C`;
+            }
+            
+            showResult(resultText, false);
+        }
+
+        // Show Result
+        function showResult(message, isError) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = 'result' + (isError ? ' error' : '') + ' show';
+            
+            // Hide result after 5 seconds
+            setTimeout(() => {
+                resultDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        // Enter key support
+        document.getElementById('temperature').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                convertTemperature();
+            }
+        });
+
+        // Input validation
+        document.getElementById('temperature').addEventListener('input', function(e) {
+            const value = e.target.value;
+            if (value && !isNaN(value)) {
+                e.target.style.borderColor = 'rgba(46, 204, 113, 0.5)';
+            } else {
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            }
+        });
+
+        // Initialize weather effects
+        createWeatherEffects();
+        
+        // Add some interactive weather effects
+        document.addEventListener('mousemove', function(e) {
+            const container = document.getElementById('weatherContainer');
+            const rainDrops = container.querySelectorAll('.rain');
+            
+            // Make rain follow mouse slightly
+            rainDrops.forEach((drop, index) => {
+                if (index % 10 === 0) { // Only affect some drops for performance
+                    const speed = (e.clientX / window.innerWidth) * 0.5;
+                    drop.style.animationDuration = (1 + speed) + 's';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
